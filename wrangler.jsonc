@@ -4,14 +4,8 @@
   "main": "src/index.js",
   "compatibility_date": "2026-10-19",
   "assets": {
-    "directory": "./public",
+    "directory": "./public/",
     "binding": "ASSETS",
     "run_worker_first": ["/api/*"]
-  },
-  "kv_namespaces": [
-    {
-      "binding": "SUBMISSIONS",
-      "id": "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
-    }
-  ]
+  }
 }

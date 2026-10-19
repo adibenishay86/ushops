@@ -1,11 +1,1 @@
-{
-  "name": "ushops-public-form",
-  "private": true,
-  "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy"
-  },
-  "devDependencies": {
-    "wrangler": "^4.0.0"
-  }
-}
+{"name":"ushops-form","private":true,"scripts":{"deploy":"wrangler deploy","dev":"wrangler dev"},"devDependencies":{"wrangler":"^4.151.2"}}

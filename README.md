@@ -1,29 +1,19 @@
-# Ushops public form - Cloudflare Worker
+# Ushops Worker
 
-## Before deploy
-Create a Cloudflare Workers KV namespace for submissions, copy its namespace ID, then replace:
+The ZIP is intentionally flat: extract its CONTENTS directly into the Git repository root.
 
-REPLACE_WITH_YOUR_KV_NAMESPACE_ID
+Expected repository root:
+- wrangler.jsonc
+- package.json
+- src/index.js
+- public/index.html
+- public/app.js
+- public/style.css
 
-in `wrangler.jsonc`.
+Deployment command: `npx wrangler deploy`
 
-The Worker expects the KV binding name to be exactly `SUBMISSIONS`.
+After deployment, `/api/health` should return `{ "ok": true }`.
 
-## Deploy from a Git repository
-Commit the whole project, including `wrangler.jsonc`, `src/` and `public/`, then connect/deploy the repository as a Cloudflare Worker project.
-
-## Deploy using Wrangler CLI
-Run:
-
-npm install
-npm run deploy
-
-## Verify
-Open `/api/health` on the deployed Worker. It should return JSON with `ok: true`.
-Then load the root URL and submit the form.
-
-## Storage
-Each successful submission is saved in KV as one JSON value. Its key is a generated UUID.
-
-## Important before broad public distribution
-Add bot/spam protection such as Cloudflare Turnstile. This package intentionally does not contain a site key or secret because those values must come from your Cloudflare account.
+## Required storage binding
+The code stores submissions in a Workers KV binding named `SUBMISSIONS`.
+Configure a KV binding named exactly `SUBMISSIONS` for this Worker in Cloudflare before testing form submission. The KV namespace ID is intentionally not hard-coded in this repository.
