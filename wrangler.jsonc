@@ -1,1 +1,23 @@
-{"$schema":"./node_modules/wrangler/config-schema.json","name":"ushops","main":"src/index.js","compatibility_date":"2026-10-19","assets":{"directory":"./public/","binding":"ASSETS","run_worker_first":["/api/*","/admin","/admin/*"]}}
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "ushops",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-19",
+  "assets": {
+    "directory": "./public/",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*", "/admin", "/admin/"]
+  },
+  "kv_namespaces": [
+    {
+      "binding": "SUBMISSIONS",
+      "id": "c3b491a11f8341448b4e9ebbed9213d7"
+    }
+  ],
+  "vars": {
+    "ADMIN_USER": "viewer"
+  },
+  "secrets": {
+    "required": ["ADMIN_PASSWORD"]
+  }
+}
