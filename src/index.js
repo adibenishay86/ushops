@@ -1,23 +1,2 @@
-const reply=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{"content-type":"application/json; charset=utf-8","cache-control":"no-store"}});
-export default {async fetch(request,env){
-  const url=new URL(request.url);
-  if(url.pathname==="/api/health") return reply({ok:true});
-  if(url.pathname==="/api/submit"){
-    if(request.method!=="POST") return reply({error:"Method Not Allowed"},405);
-    if(!env.SUBMISSIONS) return reply({error:"SUBMISSIONS KV binding is not configured"},500);
-    try{
-      const x=await request.json();
-      const required=["fullName","packagesTracking","paymentDate","stuckGoodsValue","shippingPaid","contentsDescription"];
-      if(required.some(k=>String(x[k]??"").trim()==="")) return reply({error:"Missing required fields"},400);
-      const email=String(x.email??"").trim(),phone=String(x.phone??"").trim();
-      if(!email&&!phone) return reply({error:"Email or phone is required"},400);
-      if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return reply({error:"Invalid email"},400);
-      const goods=Number(x.stuckGoodsValue),shipping=Number(x.shippingPaid);
-      if(!Number.isFinite(goods)||!Number.isFinite(shipping)||goods<0||shipping<0) return reply({error:"Invalid amounts"},400);
-      const record={id:crypto.randomUUID(),createdAt:new Date().toISOString(),fullName:String(x.fullName).trim().slice(0,200),email:email.slice(0,254),phone:phone.slice(0,30),packagesTracking:String(x.packagesTracking).trim().slice(0,1500),paymentDate:String(x.paymentDate).trim().slice(0,20),stuckGoodsValue:goods,shippingPaid:shipping,contentsDescription:String(x.contentsDescription).trim().slice(0,1000)};
-      await env.SUBMISSIONS.put(record.id,JSON.stringify(record));
-      return reply({ok:true,id:record.id});
-    }catch{return reply({error:"Invalid request"},400)}
-  }
-  return env.ASSETS.fetch(request);
-}};
+const J=(b,s=200)=>new Response(JSON.stringify(b),{status:s,headers:{"content-type":"application/json; charset=utf-8","cache-control":"no-store"}}),U=()=>new Response("Authentication required",{status:401,headers:{"WWW-Authenticate":'Basic realm="Ushops results"',"cache-control":"no-store"}});function A(r,e){const h=r.headers.get("Authorization")||"";if(!h.startsWith("Basic "))return false;try{const z=atob(h.slice(6)),i=z.indexOf(":");return i>0&&z.slice(0,i)===(e.ADMIN_USER||"")&&z.slice(i+1)===(e.ADMIN_PASSWORD||"")}catch{return false}}
+export default{async fetch(r,e){const u=new URL(r.url);if(u.pathname==="/api/health")return J({ok:true});if(u.pathname==="/api/submit"){if(r.method!=="POST")return J({error:"Method Not Allowed"},405);if(!e.SUBMISSIONS)return J({error:"SUBMISSIONS KV binding is not configured"},500);try{const x=await r.json(),req=["fullName","packagesTracking","paymentDate","stuckGoodsValue","shippingPaid","contentsDescription"];if(req.some(k=>String(x[k]??"").trim()===""))return J({error:"Missing required fields"},400);const email=String(x.email??"").trim(),phone=String(x.phone??"").trim();if(!email&&!phone)return J({error:"Email or phone is required"},400);if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return J({error:"Invalid email"},400);const g=Number(x.stuckGoodsValue),s=Number(x.shippingPaid);if(!Number.isFinite(g)||!Number.isFinite(s)||g<0||s<0)return J({error:"Invalid amounts"},400);const v={id:crypto.randomUUID(),createdAt:new Date().toISOString(),fullName:String(x.fullName).trim().slice(0,200),email:email.slice(0,254),phone:phone.slice(0,30),packagesTracking:String(x.packagesTracking).trim().slice(0,1500),paymentDate:String(x.paymentDate).slice(0,20),stuckGoodsValue:g,shippingPaid:s,contentsDescription:String(x.contentsDescription).trim().slice(0,1000)};await e.SUBMISSIONS.put(v.id,JSON.stringify(v));return J({ok:true,id:v.id})}catch{return J({error:"Invalid request"},400)}}if(u.pathname==="/admin"||u.pathname==="/admin/"){if(!A(r,e))return U();return e.ASSETS.fetch(new Request(new URL("/admin.html",u),r))}if(u.pathname==="/api/admin/submissions"){if(!A(r,e))return U();if(!e.SUBMISSIONS)return J({error:"SUBMISSIONS KV binding is not configured"},500);const a=[];let c;do{const p=await e.SUBMISSIONS.list({limit:1000,cursor:c}),v=await Promise.all(p.keys.map(k=>e.SUBMISSIONS.get(k.name,"json")));a.push(...v.filter(Boolean));c=p.list_complete?undefined:p.cursor}while(c);a.sort((x,y)=>String(y.createdAt||"").localeCompare(String(x.createdAt||"")));return J({items:a})}return e.ASSETS.fetch(r)}};
